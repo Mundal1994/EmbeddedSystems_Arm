@@ -11,7 +11,14 @@ Get practical without hardware. Quickly prototype and build microcontroller proj
 
 - Learn how to implement real-world embedded system projects on a simulated microcontroller using the Mbed API.
 
-- Modify skeleton code to implement functionality for multiple applications: an audio wave generator, an audio player, and controlling peripherals using analog and digital I/O interfaces, interrupts, timers, and pulse width modulation.
+- Modify skeleton code to implement functionality for multiple applications:
+
+      - an audio wave generator
+      - an audio player
+      - controlling peripherals using analog and digital I/O interfaces
+      - interrupts
+      - timers
+      - pulse width modulation.
 
 - Learn key features of Arm processors and architectures as the basis of modern embedded computing.
 
