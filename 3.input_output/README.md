@@ -1,4 +1,4 @@
-# module3
+# 3.input_output
 
 Develop a simple machine control system, based on an Mbed-enabled microcontroller.
 
