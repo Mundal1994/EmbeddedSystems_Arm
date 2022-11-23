@@ -8,4 +8,4 @@ The assignments are made with Mbed online compiler and Mbed simulator
 
 Create a saw-tooth sound wave
 
-Bonus: I added an option of a triangle wave instead
+Bonus: I added interrupts buttons: switch type of wave (between saw-tooth and triangle), and play and pause buttons
