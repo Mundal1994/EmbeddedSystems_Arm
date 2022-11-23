@@ -10,70 +10,91 @@ PwmOut speaker(SPEAKER);
 // Define analog inputs
 AnalogIn level(AIN1);
 AnalogIn temperature(AIN2);
+DigitalOut blink(p5);
 
 //Define variables
 float val_level;
 float val_temp;
-float i;
 
-void    status_tone()
+void    stop_blik()
+{
+    if (blink)
+        blink = !blink;
+}
+
+void    play(float hival, float loval)
+{
+    speaker.period (hival); 
+    wait_ms (500); 
+    speaker.period (loval); 
+    wait_ms (500); 
+}
+
+void    check_temperature(float upper)
 {
     float lower;
-    float upper;
     
     lower = 1.0 / 3.0;
-    upper = 2.0 / 3.0;
-    printf("check temperature %f and tank level %f %f\n", val_temp, val_level, lower);
-    if (val_level < lower)
+    if (val_temp < lower)
     {
-        printf("tank level %f too low\n", val_level);
-        //flashing LED, frequency modulated
-    }
-    else if (val_temp < lower)
-    {
+        stop_blik();
         printf("temp %f too low\n", val_temp);
         // single beeping tone
+        play(0.005, 1);
     }
     else if (val_temp > upper)
     {
+        stop_blik();
         printf("temp %f too high\n", val_temp);
-        //two-tone
+        // two-tone
+        play(0.001, 0.005);
     }
     else
     {
-        printf("OK\n");
+        stop_blik();
+        printf("tank level and temp OK!\n");
         // steady continuous tone
+        play(0.002, 0.002);
     }
-    /*
-    if temperature is too low
-        flashing LED, frequency modulated
-    else if tank full and temp too high(upper third of temperature range)
-        two-tone
-    else if tank full and temp is good (middle third of temperature range)
-        steady continuous tone
+}
+
+void    status_tone()
+{
+    float upper;
+    
+    upper = 2.0 / 3.0;
+    if (val_level < upper)
+    {
+        printf("tank level %f too low\n", val_level);
+        blink = !blink;
+        // "warble" tone - low to high value
+        for (float i = 0; i < 1; i += 0.05)
+        {
+            speaker.period(0.010 - (0.008 * i));
+            wait_ms (50);
+        }
+    }
     else
-        single beeping tone
-    */
+        check_temperature(upper);
 }
 
 int main(){
-    int i;
+    int check;
 
-    i = 0;
+    blink = 0;
+    check = 0;
+    speaker = 0.5;
     while(1){
-        // only read every two seconds?
-        if (!i)
+        if (!check)
         {
-            printf("check temperature and tank level\n");
+            // check tank level values
             val_level = level.read();
             val_temp = temperature.read();
         }
-
         status_tone();
-        wait_ms(100);
-        if (i < 20)
-            i++;
+        if (check < 1)
+            check++;
         else
-            i = 0;
+            check = 0;
     }
 }
