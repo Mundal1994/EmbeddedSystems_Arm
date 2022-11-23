@@ -4,7 +4,7 @@
 BusOut seats(p15, p14, p13, p12, p11, p10, p9, p8);
 
 /*  define interrupt inputs */
-InterruptIn parent(p5);
+InterruptIn adult(p5);
 InterruptIn child(p6);
 InterruptIn alarm(p7);
 
@@ -12,7 +12,7 @@ InterruptIn alarm(p7);
 volatile unsigned int barber1;
 volatile unsigned int barber2;
 volatile unsigned int barber3;
-volatile unsigned int parent_count;
+volatile unsigned int adult_count;
 volatile unsigned int child_count;
 volatile unsigned int occupied;
 
@@ -93,9 +93,9 @@ void    free_seat()
 if an adult enters the store they will be assigned to
 barber1 or barber2 if free or put to wait in the waiting room
 */
-void    parent_handler()
+void    adult_handler()
 {
-    if ((!barber1 || !barber2) && !parent_count)
+    if ((!barber1 || !barber2) && !adult_count)
     {
         if (!barber1)
             barber1 = 13;
@@ -106,7 +106,7 @@ void    parent_handler()
     {
         if (occupied < 8)
         {
-            parent_count++;
+            adult_count++;
             assign_seat(1);
         }
     }
@@ -114,7 +114,7 @@ void    parent_handler()
 
 /*
 if a child enters the store they will either be assigned
-to barber3 if free or put in the waiting room with their parent
+to barber3 if free or put in the waiting room with their adult
 */
 void    child_handler()
 {
@@ -140,7 +140,7 @@ void    everybody_leaves()
     barber1 = 0;
     barber2 = 0;
     barber3 = 0;
-    parent_count = 0;
+    adult_count = 0;
     child_count = 0;
     occupied = 0;
 }
@@ -181,7 +181,7 @@ void    print_barber()
         printf("barber3 with costumer - minutes left: %d\n", barber3);
     else
         printf("barber3 available\n");
-    printf("p: %d, c: %d, o: %d\n", parent_count, child_count, occupied);
+    printf("p: %d, c: %d, o: %d\n", adult_count, child_count, occupied);
 }
 
 /*  assigns a barber a new costumer */
@@ -189,9 +189,9 @@ void    assign_costumer()
 {
     if (!barber1 || !barber2)
     {
-        if (parent_count)
+        if (adult_count)
         {
-            parent_count--;
+            adult_count--;
             free_seat();
             if (!barber1)
                 barber1 = 13;
@@ -216,7 +216,7 @@ int main()
     everybody_leaves();
 
     // Interrupt handlers
-    parent.rise(&parent_handler);
+    adult.rise(&adult_handler);
     child.rise(&child_handler);
     alarm.rise(&everybody_leaves);
 
@@ -225,7 +225,7 @@ int main()
     {
         barber_with_costumer();
         print_barber();
-        while ((parent_count && (!barber1 || !barber2)) || (child_count && !barber3))
+        while ((adult_count && (!barber1 || !barber2)) || (child_count && !barber3))
             assign_costumer();
         wait_ms(1000);
     }
